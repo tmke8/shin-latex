@@ -169,38 +169,86 @@ func (e *engine) ProcessKeyEvent(keyval uint32, keycode uint32, state uint32) (b
 			log.Printf("Error from addCommand: %v", err)
 		}
 
-		binDirectory := filepath.Join(xdg.ConfigHome, "shinran", "bin")
-		commandText := fmt.Sprintf(`PATH="%v:$PATH" && %v`, binDirectory, e.text)
+		var outputText string
+		switch e.text {
+		// Check for latex math commands and return the corresponding unicode symbol.
+		case "lor":
+			outputText = "∨"
+		case "land":
+			outputText = "∧"
+		case "neg":
+			outputText = "¬"
+		case "forall":
+			outputText = "∀"
+		case "exists":
+			outputText = "∃"
+		case "in":
+			outputText = "∈"
+		case "notin":
+			outputText = "∉"
+		case "subset":
+			outputText = "⊂"
+		case "subseteq":
+			outputText = "⊆"
+		case "supset":
+			outputText = "⊃"
+		case "supseteq":
+			outputText = "⊇"
+		case "times":
+			outputText = "×"
+		case "div":
+			outputText = "÷"
+		case "pm":
+			outputText = "±"
+		case "cdot":
+			outputText = "·"
+		case "leq":
+			outputText = "≤"
+		case "geq":
+			outputText = "≥"
+		case "neq":
+			outputText = "≠"
+		case "equiv":
+			outputText = "≡"
+		case "approx":
+			outputText = "≈"
+		// Execute shell command.
+		default:
+			binDirectory := filepath.Join(xdg.ConfigHome, "shinran", "bin")
+			commandText := fmt.Sprintf(`PATH="%v:$PATH" && %v`, binDirectory, e.text)
 
-		command := exec.Command("bash", "-c", commandText)
-		output, err := command.CombinedOutput()
+			command := exec.Command("bash", "-c", commandText)
+			output, err := command.CombinedOutput()
 
-		_, isExitError := err.(*exec.ExitError)
+			_, isExitError := err.(*exec.ExitError)
 
-		e.clearText()
+			if err == nil || isExitError {
+				// Remove SGR escape sequences (text attributes) from output.
+				// This is a workaround for programs that emit escape sequences
+				// regardless of whether they are writing to a TTY or not.
+				outputText = sgrEscapeSequenceRegex.ReplaceAllString(string(output), "")
 
-		if err == nil || isExitError {
-			// Remove SGR escape sequences (text attributes) from output.
-			// This is a workaround for programs that emit escape sequences
-			// regardless of whether they are writing to a TTY or not.
-			outputText := sgrEscapeSequenceRegex.ReplaceAllString(string(output), "")
+				// Remove leading and trailing newlines from output
+				// to allow single-line output to flow into the
+				// surrounding text ...
+				outputText = strings.Trim(outputText, "\n")
 
-			// Remove leading and trailing newlines from output
-			// to allow single-line output to flow into the
-			// surrounding text ...
-			outputText = strings.Trim(outputText, "\n")
-
-			// ... but place multi-line output in a separate
-			// block surrounded by newlines, so that tabular
-			// alignment is preserved regardless of where
-			// the output is inserted.
-			if strings.Contains(outputText, "\n") {
-				outputText = "\n" + outputText + "\n"
+				// ... but place multi-line output in a separate
+				// block surrounded by newlines, so that tabular
+				// alignment is preserved regardless of where
+				// the output is inserted.
+				if strings.Contains(outputText, "\n") {
+					outputText = "\n" + outputText + "\n"
+				}
+			} else {
+				e.clearText()
+				log.Printf("Error from CombinedOutput: %v", err)
 			}
+		}
 
+		if outputText != "" {
+			e.clearText()
 			e.CommitText(ibus.NewText(outputText))
-		} else {
-			log.Printf("Error from CombinedOutput: %v", err)
 		}
 
 		e.exit()
