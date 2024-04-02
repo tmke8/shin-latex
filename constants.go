@@ -59,6 +59,6 @@ const (
 )
 
 const (
-	engineBasePath = "/org/freedesktop/IBus/Engine/Shin"
-	busName        = "org.freedesktop.IBus.Shin"
+	engineBasePath = "/org/freedesktop/IBus/Engine/Shinran"
+	busName        = "org.freedesktop.IBus.Shinran"
 )

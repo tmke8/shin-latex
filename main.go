@@ -169,7 +169,7 @@ func (e *engine) ProcessKeyEvent(keyval uint32, keycode uint32, state uint32) (b
 			log.Printf("Error from addCommand: %v", err)
 		}
 
-		binDirectory := filepath.Join(xdg.ConfigHome, "shin", "bin")
+		binDirectory := filepath.Join(xdg.ConfigHome, "shinran", "bin")
 		commandText := fmt.Sprintf(`PATH="%v:$PATH" && %v`, binDirectory, e.text)
 
 		command := exec.Command("bash", "-c", commandText)
@@ -461,7 +461,7 @@ func (e *engine) Destroy() *dbus.Error {
 }
 
 func main() {
-	log.SetPrefix("[Shin] ")
+	log.SetPrefix("[Shinran] ")
 	log.SetFlags(log.Ltime | log.Lmicroseconds)
 
 	log.Printf("Starting")

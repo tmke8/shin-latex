@@ -1,4 +1,4 @@
-module shin
+module shinran
 
 go 1.18
 

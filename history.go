@@ -18,7 +18,7 @@ type history struct {
 }
 
 func openHistory() (*history, error) {
-	dataDirectory := filepath.Join(xdg.DataHome, "shin")
+	dataDirectory := filepath.Join(xdg.DataHome, "shinran")
 	historyFile := filepath.Join(dataDirectory, "history.db")
 
 	// Note that the database file is only created when the first query is executed.
