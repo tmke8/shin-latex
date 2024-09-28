@@ -1,6 +1,6 @@
-# Shinran: Shell input method
+# Shin-latex: Shell input method and latex
 
-Shinran is a fork of [shin](https://github.com/p-e-w/shin).
+Shin-latex is a fork of [shin](https://github.com/p-e-w/shin).
 See its README for details.
 
 ## License
